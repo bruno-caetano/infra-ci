@@ -62,6 +62,20 @@ def is_inside_platform_folder(file_path: Path) -> bool:
     return file_path.parent.name.lower() in PLATFORM_FOLDER_NAMES
 
 
+def is_nested_inside_platform(file_path: Path) -> bool:
+    """
+    Checks if the file is inside a subfolder within a platform folder.
+    Expected: coletas/semanaNN/platform/file (4 parts)
+    Nested:   coletas/semanaNN/platform/sub/.../file (>4 parts)
+    """
+    parts = file_path.parts
+    for i, part in enumerate(parts):
+        if part.lower() in PLATFORM_FOLDER_NAMES:
+            if i + 1 < len(parts) - 1:
+                return True
+    return False
+
+
 def classify_file(file_path: Path) -> str:
     """
     Classifies a file inside a platform folder.
@@ -93,6 +107,12 @@ def pre_validate(changed_files_path: Path) -> bool:
     all_passed = True
 
     for file_path in changed_files:
+        if is_nested_inside_platform(file_path):
+            print(f"[FAIL] Nested folder not allowed: {file_path}")
+            print(f"  Files must be directly inside the platform folder, not in subfolders.")
+            all_passed = False
+            continue
+
         if not is_inside_platform_folder(file_path):
             print(f"[SKIP] Not inside a platform folder: {file_path}")
             continue
