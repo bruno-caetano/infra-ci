@@ -44,18 +44,22 @@ def upload_files(files):
     uploaded = []
     for file_path in sorted(files):
         rel = file_path.relative_to(COLETAS_DIR)
-        public_id = f"coletas/{str(rel.with_suffix(''))}"
+        folder = f"coletas/{str(rel.parent)}"
+        filename = rel.stem
 
         result = cloudinary.uploader.upload(
             str(file_path),
             resource_type="raw",
-            public_id=public_id,
+            folder=folder,
+            public_id=filename,
+            use_filename=True,
+            unique_filename=False,
             overwrite=True,
         )
 
         entry = {
             "file": str(rel),
-            "public_id": public_id,
+            "public_id": result["public_id"],
             "url": result["secure_url"],
         }
         uploaded.append(entry)
