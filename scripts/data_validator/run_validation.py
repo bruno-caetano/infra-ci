@@ -7,6 +7,7 @@ Usage: python run_validation.py <changed_files_list>
 """
 
 import json
+import os
 import re
 import sys
 import subprocess
@@ -54,6 +55,12 @@ def run_validation(changed_files_path: Path) -> bool:
 
     collection_csvs = [f for f in changed_files if is_collection_csv(f)]
 
+    print(f"[DEBUG] cwd: {os.getcwd()}")
+    print(f"[DEBUG] VALIDATE_SCRIPT: {VALIDATE_SCRIPT}")
+    print(f"[DEBUG] VALIDATE_SCRIPT exists: {VALIDATE_SCRIPT.exists()}")
+    print(f"[DEBUG] Total changed files: {len(changed_files)}")
+    print(f"[DEBUG] Collection CSVs: {len(collection_csvs)}")
+
     if not collection_csvs:
         print("No collection CSVs to validate.")
         return True
@@ -62,6 +69,12 @@ def run_validation(changed_files_path: Path) -> bool:
 
     for csv_file in collection_csvs:
         platform = extract_platform(csv_file)
+        resolved = csv_file.resolve()
+
+        print(f"[DEBUG] csv_file (raw): {csv_file}")
+        print(f"[DEBUG] csv_file (resolved): {resolved}")
+        print(f"[DEBUG] csv_file.exists(): {csv_file.exists()}")
+        print(f"[DEBUG] platform: {platform}")
 
         if not csv_file.exists():
             print(f"[SKIP] File not found: {csv_file}")
@@ -71,9 +84,10 @@ def run_validation(changed_files_path: Path) -> bool:
         print(f"[RUN] {csv_file.name} -> --platform {platform}")
         print(f"{'=' * 60}")
 
-        result = subprocess.run(
-            [sys.executable, str(VALIDATE_SCRIPT), str(csv_file), "--platform", platform],
-        )
+        cmd = [sys.executable, str(VALIDATE_SCRIPT), str(resolved), "--platform", platform]
+        print(f"[DEBUG] Command: {' '.join(cmd)}")
+
+        result = subprocess.run(cmd)
 
         if result.returncode != 0:
             all_passed = False
