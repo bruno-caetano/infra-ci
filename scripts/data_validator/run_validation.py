@@ -1,12 +1,13 @@
 """
-Wrapper script that reads a list of changed CSV files, infers the platform
-from the parent folder name, and runs validatecsv.py for each file.
+Runs content validation on collection CSVs found in the changed files list.
+Assumes pre_validate.py has already checked file structure and naming.
 
 Usage: python run_validation.py <changed_files_list>
-  where <changed_files_list> is a text file with one CSV path per line.
+  where <changed_files_list> is a text file with one file path per line.
 """
 
 import json
+import re
 import sys
 import subprocess
 from pathlib import Path
@@ -18,17 +19,29 @@ CONFIG_PATH = SCRIPT_DIR.parent / "config.json"
 with open(CONFIG_PATH) as f:
     KNOWN_PLATFORMS = json.load(f)["platforms"]
 
+DATE_PATTERN = r"\d{4}-\d{2}-\d{2}"
+PLATFORM_GROUP = '|'.join(KNOWN_PLATFORMS)
 
-def extract_platform(csv_path: Path) -> str | None:
+COLLECTION_REGEX = re.compile(
+    rf"^({PLATFORM_GROUP})_{DATE_PATTERN}_{DATE_PATTERN}\.csv$"
+)
+
+
+def extract_platform(file_path: Path) -> str | None:
     """
     Extracts the platform name from the parent folder.
     e.g. 'instagram_2026-03-02_2026-03-08' -> 'instagram'
     """
-    parent_name = csv_path.parent.name
+    parent_name = file_path.parent.name
     prefix = parent_name.split("_")[0].lower()
     if prefix in KNOWN_PLATFORMS:
         return prefix
     return None
+
+
+def is_collection_csv(file_path: Path) -> bool:
+    """Checks if the file is a collection CSV."""
+    return COLLECTION_REGEX.match(file_path.name.lower()) is not None
 
 
 def run_validation(changed_files_path: Path) -> bool:
@@ -37,20 +50,18 @@ def run_validation(changed_files_path: Path) -> bool:
         return True
 
     lines = changed_files_path.read_text().strip().splitlines()
-    csv_files = [Path(line.strip()) for line in lines if line.strip().endswith(".csv")]
+    changed_files = [Path(line.strip()) for line in lines if line.strip()]
 
-    if not csv_files:
-        print("No CSV files changed in this PR.")
+    collection_csvs = [f for f in changed_files if is_collection_csv(f)]
+
+    if not collection_csvs:
+        print("No collection CSVs to validate.")
         return True
 
     all_passed = True
 
-    for csv_file in csv_files:
+    for csv_file in collection_csvs:
         platform = extract_platform(csv_file)
-
-        if platform is None:
-            print(f"[SKIP] Could not detect platform for: {csv_file}")
-            continue
 
         if not csv_file.exists():
             print(f"[SKIP] File not found: {csv_file}")
