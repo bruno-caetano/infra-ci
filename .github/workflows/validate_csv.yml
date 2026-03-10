@@ -45,28 +45,19 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Install rclone
-        run: curl https://rclone.org/install.sh | sudo bash
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-      - name: Configure rclone
-        run: |
-          mkdir -p ~/.config/rclone
-          echo '${{ secrets.GDRIVE_SA_CREDENTIALS }}' > /tmp/sa.json
-          cat > ~/.config/rclone/rclone.conf << EOF
-          [gdrive]
-          type = drive
-          scope = drive
-          service_account_file = /tmp/sa.json
-          root_folder_id = ${{ secrets.GDRIVE_FOLDER_ID }}
-          EOF
+      - name: Install dependencies
+        run: pip install google-api-python-client google-auth
 
       - name: Upload to Google Drive
-        run: |
-          rclone copy coletas/ gdrive:coletas/ \
-            --include "*.csv" \
-            --include "*.txt" \
-            --verbose
-          echo "Upload complete."
+        env:
+          GDRIVE_SA_CREDENTIALS: ${{ secrets.GDRIVE_SA_CREDENTIALS }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: python scripts/upload_to_drive.py
 
       - name: Comment and close PR
         uses: actions/github-script@v7
@@ -84,7 +75,3 @@ jobs:
               pull_number: context.issue.number,
               state: 'closed'
             });
-
-      - name: Cleanup credentials
-        if: always()
-        run: rm -f /tmp/sa.json
