@@ -6,23 +6,29 @@ Infraestrutura e CI/CD para gerenciamento de coletas de dados de redes sociais.
 
 ```
 .github/workflows/
-├── create_next_week_folder.yml   # Agendado: cria estrutura de pastas semanal
-└── validate_csv.yml              # Trigger de PR: valida arquivos em coletas/
+├── create_next_week_folder.yml    # Agendado: cria estrutura de pastas semanal
+├── validate_csv.yml               # Trigger de PR: valida arquivos em coletas/
+└── upload_to_cloudinary.yml        # Trigger de label: envia arquivos ao Cloudinary
 
 scripts/
-├── config.json                   # Configuração compartilhada (lista de plataformas)
-├── data_validator/               # Scripts de validação (ver README próprio)
-│   ├── pre_validate.py           # Pré-validação: estrutura e nomenclatura
-│   ├── run_validation.py         # Executa validação de conteúdo nos CSVs de coleta
-│   ├── validate_csv.py           # Validador principal de CSV
-│   ├── schemas.py                # Definições de schema por plataforma
-│   └── data_format.py            # Funções de validação de tipos
+├── config.json                    # Configuração compartilhada (lista de plataformas)
+├── data_validator/                # Scripts de validação (ver README próprio)
+│   ├── pre_validate.py            # Pré-validação: estrutura e nomenclatura
+│   ├── run_validation.py          # Executa validação de conteúdo nos CSVs de coleta
+│   ├── validate_csv.py            # Validador principal de CSV
+│   ├── schemas.py                 # Definições de schema por plataforma
+│   └── data_format.py             # Funções de validação de tipos
+├── cloudinary/                    # Scripts de upload para o Cloudinary
+│   ├── upload.py                  # Upload de CSVs/TXTs para o Cloudinary
+│   └── update_index.py            # Atualiza índice de links das coletas
 └── folder_creation/
     └── create_next_week_folder.py  # Cria estrutura de pastas da próxima semana
 
-coletas/                          # Arquivos de coleta de dados
+coletas/                           # Arquivos de coleta de dados
 └── semanaNN-YYYY-MM-DD_YYYY-MM-DD/
     └── {plataforma}/
+
+coletas_index.md                   # Índice de arquivos enviados ao Cloudinary
 ```
 
 ## Padrão de Nomenclatura
@@ -68,7 +74,19 @@ Definidas em [`scripts/config.json`](scripts/config.json). Para adicionar ou rem
 - **Etapas:**
   1. **Pré-validação** — verifica se os arquivos seguem os padrões de nomenclatura e estão na pasta correta
   2. **Validação de conteúdo** — executa `validate_csv.py` com o parâmetro `--platform` correto para cada CSV de coleta
+  3. **Comentário** — se tudo passar, comenta no PR instruindo a adicionar o label `upload`
 - **Arquivo:** [`.github/workflows/validate_csv.yml`](.github/workflows/validate_csv.yml)
+
+### Upload para Cloudinary
+
+- **Trigger:** Label `upload` adicionado ao PR
+- **Etapas:**
+  1. **Upload** — envia CSVs e TXTs para o Cloudinary
+  2. **Índice** — atualiza [`coletas_index.md`](coletas_index.md) com links dos arquivos enviados
+  3. **Fechamento** — comenta no PR com links e fecha automaticamente
+- **Arquivo:** [`.github/workflows/upload_to_cloudinary.yml`](.github/workflows/upload_to_cloudinary.yml)
+
+> O PR **não é mergeado**. Serve apenas como gate de validação e upload. Os CSVs vão direto para o Cloudinary.
 
 Para mais detalhes sobre os scripts de validação, consulte o [README do data_validator](scripts/data_validator/README.md).
 
@@ -101,3 +119,28 @@ Para mais opções (ignorar colunas, etc.), consulte:
 ```bash
 python3 scripts/data_validator/validate_csv.py --help
 ```
+
+## Setup do Cloudinary (para administradores)
+
+### 1. Criar conta
+
+1. Acesse [cloudinary.com](https://cloudinary.com) e crie uma conta (plano free: 25GB)
+2. No **Dashboard**, copie: **Cloud Name**, **API Key** e **API Secret**
+
+### 2. Configurar GitHub Secrets
+
+No repositório, vá em **Settings > Secrets and variables > Actions** e crie:
+
+| Secret | Valor |
+|---|---|
+| `CLOUDINARY_CLOUD_NAME` | Cloud Name do dashboard |
+| `CLOUDINARY_API_KEY` | API Key |
+| `CLOUDINARY_API_SECRET` | API Secret |
+
+### 3. Criar label no repositório
+
+1. Vá em **Issues > Labels > New label**
+2. Nome: `upload`
+3. Cor: escolha uma cor (sugestão: verde)
+
+Após esses passos, o fluxo de upload estará funcional.

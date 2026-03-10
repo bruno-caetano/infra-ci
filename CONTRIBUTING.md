@@ -106,9 +106,18 @@ Se o CI falhar, verifique os logs na aba Actions do GitHub:
 
 Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cada push.
 
-### 6. Merge
+### 6. Enviar ao Cloudinary
 
-Após o CI passar e a revisão ser aprovada, faça o merge do PR.
+Após a validação passar, o bot vai comentar no PR:
+
+> Validacao concluida com sucesso. Para enviar os arquivos ao Cloudinary, adicione o label **`upload`** a este PR.
+
+1. No PR, clique em **Labels** (barra lateral direita)
+2. Selecione o label **`upload`**
+3. O workflow de upload será disparado automaticamente
+4. Após o upload, o PR será fechado com um comentário contendo os links dos arquivos
+
+> **Nota:** O PR **não é mergeado**. Os CSVs vão direto para o Cloudinary. O índice de links é atualizado em [`coletas_index.md`](coletas_index.md).
 
 ## Passo a Passo (via GitHub Web)
 
@@ -145,6 +154,10 @@ Se preferir subir os arquivos diretamente pelo navegador, sem usar o terminal:
 ### 5. Corrigir erros (se houver)
 
 Se o CI falhar, volte à sua branch, delete os arquivos incorretos e suba novamente.
+
+### 6. Enviar ao Cloudinary
+
+Quando a validação passar, adicione o label **`upload`** ao PR para disparar o envio ao Cloudinary. O PR será fechado automaticamente após o upload.
 
 ## PRs Parciais
 
