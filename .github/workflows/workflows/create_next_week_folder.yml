@@ -1,0 +1,33 @@
+name: Create Next Week Folder
+
+on:
+  schedule:
+    # Every Sunday at 18:00 UTC (creates the folder for the following week)
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create_folder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Create next week folder
+        run: python scripts/folder_creation/create_next_week_folder.py
+
+      - name: Commit and push new folder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add coletas/
+          git diff --cached --quiet || git commit -m "chore: auto-create week folder $(date +'%Y-%m-%d')"
+          git push
