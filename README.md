@@ -16,8 +16,7 @@ scripts/
 │   ├── run_validation.py         # Executa validação de conteúdo nos CSVs de coleta
 │   ├── validate_csv.py           # Validador principal de CSV
 │   ├── schemas.py                # Definições de schema por plataforma
-│   ├── data_format.py            # Funções de validação de tipos
-│   └── testdata/                 # Arquivos CSV de teste
+│   └── data_format.py            # Funções de validação de tipos
 └── folder_creation/
     └── create_next_week_folder.py  # Cria estrutura de pastas da próxima semana
 
