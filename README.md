@@ -7,7 +7,7 @@ Infraestrutura e CI/CD para gerenciamento de coletas de dados de redes sociais.
 ```
 .github/workflows/
 ├── create_next_week_folder.yml   # Agendado: cria estrutura de pastas semanal
-└── validate_csv.yml              # Trigger de PR: valida arquivos em coletas/
+└── validate_csv.yml              # Trigger de PR: valida, envia para Drive e fecha PR
 
 scripts/
 ├── config.json                   # Configuração compartilhada (lista de plataformas)
@@ -22,9 +22,8 @@ scripts/
     └── create_next_week_folder.py  # Cria estrutura de pastas da próxima semana
 
 coletas/                          # Arquivos de coleta de dados
-└── MM-YYYY/
-    └── SemanaNN-YYYY-MM-DD_YYYY-MM-DD/
-        └── {plataforma}_YYYY-MM-DD_YYYY-MM-DD/
+└── semanaNN-YYYY-MM-DD_YYYY-MM-DD/
+    └── {plataforma}/
 ```
 
 ## Padrão de Nomenclatura
@@ -33,9 +32,8 @@ coletas/                          # Arquivos de coleta de dados
 
 | Tipo | Formato | Exemplo |
 |---|---|---|
-| Mês | `MM-YYYY` | `02-2026`, `03-2026` |
-| Semana | `Semana{NN}-{YYYY-MM-DD}_{YYYY-MM-DD}` | `Semana01-2026-02-02_2026-02-08` |
-| Plataforma | `{plataforma}_{YYYY-MM-DD}_{YYYY-MM-DD}` | `instagram_2026-03-02_2026-03-08` |
+| Semana | `semana{NN}-{YYYY-MM-DD}_{YYYY-MM-DD}` | `semana05-2026-03-02_2026-03-08` |
+| Plataforma | `{plataforma}` | `instagram`, `youtube` |
 
 - **NN** — número sequencial da semana (contínuo entre meses)
 - **Primeira data** — segunda-feira (início da semana)
@@ -62,16 +60,20 @@ Definidas em [`scripts/config.json`](scripts/config.json). Para adicionar ou rem
 ### Criação de Pasta Semanal
 
 - **Trigger:** Todo domingo às 18:00 UTC (cron) + disparo manual
-- **O que faz:** Cria a estrutura de pastas para a semana seguinte com subpastas para cada plataforma
+- **O que faz:** Cria a estrutura de pastas para a semana seguinte com subpastas para cada plataforma. Remove automaticamente pastas de semanas antigas que estão vazias (mantém as últimas 2).
 - **Arquivo:** [`.github/workflows/create_next_week_folder.yml`](.github/workflows/create_next_week_folder.yml)
 
-### Validação de Coletas
+### Validação e Upload de Coletas
 
 - **Trigger:** Pull requests para `main`/`master` que alterem arquivos em `coletas/`
 - **Etapas:**
   1. **Pré-validação** — verifica se os arquivos seguem os padrões de nomenclatura e estão na pasta correta
   2. **Validação de conteúdo** — executa `validate_csv.py` com o parâmetro `--platform` correto para cada CSV de coleta
+  3. **Upload para Google Drive** — envia os CSVs e TXTs via rclone (só roda se a validação passar)
+  4. **Fechamento do PR** — PR é fechado automaticamente com comentário de sucesso
 - **Arquivo:** [`.github/workflows/validate_csv.yml`](.github/workflows/validate_csv.yml)
+
+> Os CSVs **nunca são mergeados** no `main`. O PR serve apenas como gate de validação. Após o upload para o Drive, o PR é fechado automaticamente.
 
 Para mais detalhes sobre os scripts de validação, consulte o [README do data_validator](scripts/data_validator/README.md).
 
@@ -96,7 +98,7 @@ python3 scripts/data_validator/validate_csv.py <arquivo.csv> --platform <platafo
 Exemplo:
 
 ```bash
-python3 scripts/data_validator/validate_csv.py coletas/03-2026/Semana05-.../x_2026-03-02_2026-03-08/x_2026-03-02_2026-03-08.csv --platform x
+python3 scripts/data_validator/validate_csv.py coletas/semana05-2026-03-02_2026-03-08/x/x_2026-03-02_2026-03-08.csv --platform x
 ```
 
 Para mais opções (ignorar colunas, etc.), consulte:
@@ -104,3 +106,43 @@ Para mais opções (ignorar colunas, etc.), consulte:
 ```bash
 python3 scripts/data_validator/validate_csv.py --help
 ```
+
+## Setup do Google Drive (para administradores)
+
+O workflow de upload utiliza uma Service Account do Google para enviar arquivos ao Drive via [rclone](https://rclone.org/). Siga os passos abaixo para configurar do zero.
+
+### 1. Criar projeto no Google Cloud
+
+1. Acesse [console.cloud.google.com](https://console.cloud.google.com)
+2. Crie um novo projeto (ou use um existente)
+3. Vá em **APIs & Services > Enable APIs** e habilite a **Google Drive API**
+
+### 2. Criar Service Account
+
+1. Vá em **IAM & Admin > Service Accounts > Create Service Account**
+2. Nome: `rclone-ci` (ou o que preferir)
+3. Não é necessário atribuir roles
+4. Na service account criada, vá em **Keys > Add Key > Create new key > JSON**
+5. Vai baixar um arquivo `.json` — este é o arquivo de credenciais
+
+### 3. Compartilhar pasta do Google Drive
+
+1. No arquivo JSON, copie o valor do campo `client_email` (ex: `rclone-ci@projeto.iam.gserviceaccount.com`)
+2. No Google Drive, crie (ou abra) a pasta destino das coletas
+3. Compartilhe a pasta com o email da Service Account com permissão de **Editor**
+4. Copie o **ID da pasta** da URL:
+   ```
+   https://drive.google.com/drive/folders/XXXXXXXXXXXXXXXXXXXXX
+                                          ^^^^^^^^^^^^^^^^^^^^^ este ID
+   ```
+
+### 4. Configurar GitHub Secrets
+
+No repositório, vá em **Settings > Secrets and variables > Actions** e crie dois secrets:
+
+| Secret | Valor |
+|---|---|
+| `GDRIVE_SA_CREDENTIALS` | Conteúdo **inteiro** do arquivo JSON da Service Account |
+| `GDRIVE_FOLDER_ID` | ID da pasta do Google Drive (copiado no passo 3) |
+
+Após esses passos, o workflow vai enviar automaticamente os CSVs validados para a pasta do Google Drive.
