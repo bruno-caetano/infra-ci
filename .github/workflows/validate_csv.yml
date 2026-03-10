@@ -1,14 +1,10 @@
-name: Validate and Upload CSV Data
+name: Validate CSV Data
 
 on:
   pull_request:
     branches: [ master, main ]
     paths:
       - 'coletas/**'
-
-permissions:
-  contents: read
-  pull-requests: write
 
 jobs:
   validate:
@@ -22,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Get changed files
         run: |
@@ -35,43 +31,3 @@ jobs:
 
       - name: Validate CSV content
         run: python scripts/data_validator/run_validation.py changed_files.txt
-
-  upload:
-    needs: validate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: pip install google-api-python-client google-auth
-
-      - name: Upload to Google Drive
-        env:
-          GDRIVE_SA_CREDENTIALS: ${{ secrets.GDRIVE_SA_CREDENTIALS }}
-          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
-        run: python scripts/upload_to_drive.py
-
-      - name: Comment and close PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: 'Validação passou e arquivos enviados para o Google Drive. Fechando PR automaticamente.'
-            });
-            await github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            });
