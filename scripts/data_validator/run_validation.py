@@ -72,7 +72,7 @@ def run_validation(changed_files_path: Path) -> bool:
         print(f"{'=' * 60}")
 
         result = subprocess.run(
-            [sys.executable, str(VALIDATE_SCRIPT), str(csv_file), "--platform", platform],
+            [sys.executable, str(VALIDATE_SCRIPT), str(csv_file.resolve()), "--platform", platform],
             cwd=str(SCRIPT_DIR),
         )
 
