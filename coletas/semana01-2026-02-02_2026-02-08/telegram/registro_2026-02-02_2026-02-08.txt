@@ -1,0 +1,21 @@
+﻿Telegram canais
+start: 2026-02-02T00:00:00-03:00
+end: 2026-02-08T23:59:00-03:00
+plataforma: telegram
+janela: 2026-02-02..2026-02-08
+modo: canais
+parâmetros: query, channel_username, channel_title, message_id, chat_id, user_id, date, text, post_link, caption, views, forwards, reactions, reply_to_message, forward_from, entities, photo, video, document, post_author, edit_date, media_group_id
+destinos: centraldocerrado, patria_agronegocios, ANAagroecologia, celiaxakriaba, reginaldolopesmg, terezacrisms, profepaulamarisa, SamPancherbr, oreinaldoazevedo, jonesmanoel, manudavila, agroestadao, folha, bbcbrasil, oficialjpnews, revistaoesteoficial, oglobojornal, estadao, GloboNewsBrasil, brasildefato, canal_rural, brasilparalelooficial, vejaoficial, correio_braziliense, DW_brasil, Theinterceptbr, ICLNoticiasRSS, OJOIOEOTRIGO, observatoriodacana
+histórico_mensagens: 1 semana
+incluir_encaminhadas: sim
+responsável: Bruna
+itens_coletados: 593
+itens_descartados: 5
+integridade:
+  deduplicação_por_link_forward: aplicada
+  normalização_md_html: aplicada
+erros: SamPancherbr: Nobody is using this username, or the username is unacceptable. If the latter, it must match r"[a-zA-Z][\w\d]{3,30}[a-zA-Z\d]" (caused by ResolveUsernameRequest)
+avisos: nenhum
+tempo coleta: 34 minutos
+tempo adicional: 15 minutos de validação manual para a coluna 'validation_status'
+observações: mensagens apagadas após a coleta não são reprocessadas

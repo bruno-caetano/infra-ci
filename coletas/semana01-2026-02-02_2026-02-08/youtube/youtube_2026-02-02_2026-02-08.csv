@@ -1,0 +1,24 @@
+collect_query,collect_description,collect_posts_amount,collect_requested_at,collect_created_at,collect_done_at,collect_is_data_deduplicate,collect_is_ad_free,collect_is_privacy_validated,collect_warnings,collect_errors,collect_observations,collect_date_range_start,collect_date_range_end
+"        [""Agricultura Familiar"", ""Regularização Ambiental"", ""Cadastro Ambiental Rural"", 
+        ""Imóvel Rural"", ""Educação Alimentar"", ""Reforma Agrária"", ""Quilombos"", 
+        ""Quilombolas"", ""Indígenas"", ""Cooperativa Agrícola"", ""Cooperativismo"", 
+        ""Agroecologia"", ""Agrofloresta"", ""Sisteminha"", ""Povos Tradicionais"", 
+        ""Sistemas Agroflorestais"", ""Justiça Climática"", ""Educação Ambiental"", 
+        ""Afroambiental"", ""Incra"", ""Imposto sobre propriedade rural"", ""MDA"", 
+        ""MDS"", ""Ocupante Irregular"", ""Vida no Campo"", ""Pecuaria"", ""Pecuaria Brasil"", 
+        ""PecuariaBr"", ""Produtor Rural"", ""Ceasa"", ""Ceasaminas"", ""Desenvolvimento Agrário"", 
+        ""Assistência Técnica"", ""Abastecimento Alimentar"", ""Extensão Rural"", 
+        ""Segurança Alimentar"", ""Combate à Fome"", ""Campesinato"", ""Movimento Sem Terra"", 
+        ""Mulheres Camponesas"", ""Atingidos por Barragens"", ""Economia Solidária"", 
+        ""Crédito Rural"", ""Manejo Florestal"", ""Defesa do Cerrado"", ""Fiscalização Ambiental"", 
+        ""Pecuária"", ""Sojicultura"", ""Setor Sucroenergético"", ""Frente Parlamentar da Agropecuária"", 
+        ""PAA"", ""PNAE"", ""Pronaf"", ""Pronamp"", ""PGPAF"", ""Garantia-Safra"", ""Plano Safra"", 
+        ""ProVB"", ""Bioinsumos"", ""Sementes Crioulas"", ""Policultura"", ""Manejo Florestal Sustentável"", 
+        ""Renovagro"", ""Efeito Poupa-Terra"", ""Soberania Alimentar"", ""Segurança Alimentar e Nutricional"", 
+        ""Povos e Comunidades Tradicionais"", ""Inclusão Produtiva"", ""Regularização Fundiária"", 
+        ""Sucessão Familiar"", ""Comunidades Quilombolas"", ""Terras Indígenas"", ""Seguro Rural"", 
+        ""Proagro"", ""Zarc (Zoneamento Agrícola de Risco Climático)"", 
+        ""Circuitos Curtos de Comercialização"", ""Bioeconomia Florestal"", ""Créditos de Carbono""]",Primeira rodada de coleta por termos.,1912,"2026-02-09T18:25:00Z
+",,2026-02-09T18:40:21Z,TRUE,TRUE,TRUE,1 rate_limit retry,None,,"2026-02-02T00:00:00Z
+","2026-02-08T23:59:59Z
+"
