@@ -1,0 +1,4 @@
+collect_posts_amount,collect_started_at,collect_done_at,collect_is_data_deduplicated,collect_is_ad_free,collect_is_privacy_validated,collect_warnings,collect_errors,collect_observations,collect_summary_observations
+29753,2026-03-08 16:07:21,2026-03-09 11:02:21,FALSE,FALSE,TRUE,Sem alertas emitidos,Sem erros obtidos,"Foi resolvido o erro relacionado ao tempo: o problema ocorreu porque estava sendo considerado 7 dias completos de coleta, quando na verdade o intervalo correto era de 6 dias, 23 horas e 59 minutos.
+De qualquer forma, o horário já estava convertido para UTC-3, pois os dados são capturados diretamente da interface do navegador por meio do JSON do X, que já retorna no horário de Brasília.
+"," Alguns dos dados continua sendo marcados como ""FLAGGED"""
