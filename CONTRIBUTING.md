@@ -52,10 +52,13 @@ instagram/
 ├── insta_2026-03-02_2026-03-08.csv    ERRO: nome da plataforma incorreto
 ├── dados.xlsx                         ERRO: formato não permitido
 ├── meu_arquivo.csv                    ERRO: nome fora do padrão
-└── facebook_2026-03-02_2026-03-08.csv ERRO: plataforma diferente da pasta
+├── facebook_2026-03-02_2026-03-08.csv ERRO: plataforma diferente da pasta
+└── subpasta/                          ERRO: subpastas não são permitidas
 ```
 
-## Passo a Passo
+> **Atenção:** os arquivos devem estar **diretamente** na pasta da plataforma. Subpastas dentro da plataforma serão rejeitadas pelo CI.
+
+## Passo a Passo (via terminal)
 
 ### 1. Criar uma branch
 
@@ -98,6 +101,7 @@ Se o CI falhar, verifique os logs na aba Actions do GitHub:
 
 - **`[FAIL] File not allowed`** — arquivo com nome ou formato incorreto
 - **`[FAIL] Platform mismatch`** — arquivo na pasta da plataforma errada
+- **`[FAIL] Nested folder`** — subpasta encontrada dentro da pasta da plataforma
 - **Erros de schema** — colunas faltando ou tipos incorretos no CSV
 
 Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cada push.
@@ -105,6 +109,42 @@ Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cad
 ### 6. Merge
 
 Após o CI passar e a revisão ser aprovada, faça o merge do PR.
+
+## Passo a Passo (via GitHub Web)
+
+Se preferir subir os arquivos diretamente pelo navegador, sem usar o terminal:
+
+### 1. Criar uma branch
+
+1. No repositório, clique no seletor de branch (onde diz `main`)
+2. Digite o nome da nova branch: `coleta/<plataforma>-semanaNN`
+3. Clique em **Create branch: coleta/...**
+
+### 2. Navegar até a pasta correta
+
+1. Navegue até `coletas/semanaNN-datas/<plataforma>/`
+   - Exemplo: `coletas/semana05-2026-03-02_2026-03-08/instagram/`
+2. Certifique-se de que está **dentro da pasta da plataforma** antes de fazer upload
+
+### 3. Fazer upload dos arquivos
+
+1. Clique em **Add file > Upload files**
+2. Arraste ou selecione **apenas os arquivos CSV/TXT** da coleta
+3. **Não crie subpastas** — os arquivos devem ficar diretamente na pasta da plataforma
+4. Em "Commit message", escreva: `coleta: <plataforma> semana NN`
+5. Confirme que o commit vai para a **sua branch** (não para `main`)
+6. Clique em **Commit changes**
+
+### 4. Abrir o Pull Request
+
+1. O GitHub vai sugerir criar um PR — clique em **Compare & pull request**
+2. Verifique se o destino é `main`
+3. Clique em **Create pull request**
+4. O CI roda automaticamente
+
+### 5. Corrigir erros (se houver)
+
+Se o CI falhar, volte à sua branch, delete os arquivos incorretos e suba novamente.
 
 ## PRs Parciais
 
