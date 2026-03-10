@@ -18,6 +18,7 @@ scripts/
 │   ├── schemas.py                # Definições de schema por plataforma
 │   ├── data_format.py            # Funções de validação de tipos
 │   └── testdata/                 # Arquivos CSV de teste
+├── upload_to_drive.py            # Upload de coletas para o Google Drive
 └── folder_creation/
     └── create_next_week_folder.py  # Cria estrutura de pastas da próxima semana
 
@@ -109,7 +110,7 @@ python3 scripts/data_validator/validate_csv.py --help
 
 ## Setup do Google Drive (para administradores)
 
-O workflow de upload utiliza uma Service Account do Google para enviar arquivos ao Drive via [rclone](https://rclone.org/). Siga os passos abaixo para configurar do zero.
+O workflow de upload utiliza uma Service Account do Google para enviar arquivos ao Drive via script Python (`scripts/upload_to_drive.py`). Siga os passos abaixo para configurar do zero.
 
 ### 1. Criar projeto no Google Cloud
 
@@ -120,14 +121,14 @@ O workflow de upload utiliza uma Service Account do Google para enviar arquivos 
 ### 2. Criar Service Account
 
 1. Vá em **IAM & Admin > Service Accounts > Create Service Account**
-2. Nome: `rclone-ci` (ou o que preferir)
+2. Nome: `gdrive-ci` (ou o que preferir)
 3. Não é necessário atribuir roles
 4. Na service account criada, vá em **Keys > Add Key > Create new key > JSON**
 5. Vai baixar um arquivo `.json` — este é o arquivo de credenciais
 
 ### 3. Compartilhar pasta do Google Drive
 
-1. No arquivo JSON, copie o valor do campo `client_email` (ex: `rclone-ci@projeto.iam.gserviceaccount.com`)
+1. No arquivo JSON, copie o valor do campo `client_email` (ex: `gdrive-ci@projeto.iam.gserviceaccount.com`)
 2. No Google Drive, crie (ou abra) a pasta destino das coletas
 3. Compartilhe a pasta com o email da Service Account com permissão de **Editor**
 4. Copie o **ID da pasta** da URL:
