@@ -25,6 +25,8 @@ def month_folder(start_date):
 
 def next_week_number():
     highest = 0
+    if not os.path.isdir(COLETAS_DIR):
+        return highest + 1
     for month in os.listdir(COLETAS_DIR):
         month_path = os.path.join(COLETAS_DIR, month)
         if not os.path.isdir(month_path):
