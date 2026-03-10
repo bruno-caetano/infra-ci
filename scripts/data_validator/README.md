@@ -23,7 +23,7 @@ python validate_csv.py <arquivo.csv> --platform <plataforma>
 Exemplo:
 
 ```bash
-python validate_csv.py coletas/03-2026/Semana05-.../x_2026-03-02_2026-03-08/x_2026-03-02_2026-03-08.csv --platform x
+python validate_csv.py coletas/semana05-2026-03-02_2026-03-08/x/x_2026-03-02_2026-03-08.csv --platform x
 ```
 
 ### Parâmetros
@@ -54,6 +54,10 @@ O workflow `validate_csv.yml` executa automaticamente em PRs que alteram arquivo
 
 1. **Pre-validate** — verifica nomes de arquivos e pastas
 2. **Validate CSV content** — valida conteúdo dos CSVs de coleta contra os schemas
+3. **Upload para Google Drive** — envia os arquivos via rclone (só roda se a validação passar)
+4. **Fechamento do PR** — PR é fechado automaticamente
+
+> Os CSVs nunca são mergeados no `main`. O PR serve apenas como gate de validação.
 
 ## Observações
 

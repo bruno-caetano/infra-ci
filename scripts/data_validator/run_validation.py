@@ -30,12 +30,11 @@ COLLECTION_REGEX = re.compile(
 def extract_platform(file_path: Path) -> str | None:
     """
     Extracts the platform name from the parent folder.
-    e.g. 'instagram_2026-03-02_2026-03-08' -> 'instagram'
+    e.g. 'instagram' -> 'instagram'
     """
-    parent_name = file_path.parent.name
-    prefix = parent_name.split("_")[0].lower()
-    if prefix in KNOWN_PLATFORMS:
-        return prefix
+    parent_name = file_path.parent.name.lower()
+    if parent_name in KNOWN_PLATFORMS:
+        return parent_name
     return None
 
 

@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -19,36 +20,53 @@ def next_week_range():
     return monday, sunday
 
 
-def month_folder(start_date):
-    return start_date.strftime("%m-%Y")
-
-
 def next_week_number():
     highest = 0
     if not os.path.isdir(COLETAS_DIR):
         return highest + 1
-    for month in os.listdir(COLETAS_DIR):
-        month_path = os.path.join(COLETAS_DIR, month)
-        if not os.path.isdir(month_path):
-            continue
-        for week in os.listdir(month_path):
-            match = re.match(r"Semana(\d+)-", week)
-            if match:
-                highest = max(highest, int(match.group(1)))
+    for entry in os.listdir(COLETAS_DIR):
+        match = re.match(r"semana(\d+)-", entry)
+        if match:
+            highest = max(highest, int(match.group(1)))
     return highest + 1
+
+
+KEEP_WEEKS = 2
+
+
+def cleanup_old_weeks(current_week_num):
+    if not os.path.isdir(COLETAS_DIR):
+        return
+    cutoff = current_week_num - KEEP_WEEKS
+    for entry in sorted(os.listdir(COLETAS_DIR)):
+        match = re.match(r"semana(\d+)-", entry)
+        if not match:
+            continue
+        week_num = int(match.group(1))
+        if week_num > cutoff:
+            continue
+        week_path = os.path.join(COLETAS_DIR, entry)
+        has_files = any(
+            f != ".gitkeep"
+            for _, _, files in os.walk(week_path)
+            for f in files
+        )
+        if has_files:
+            print(f"[SKIP] {entry} (still has files)")
+            continue
+        shutil.rmtree(week_path)
+        print(f"[REMOVED] {entry}")
 
 
 def create_structure():
     monday, sunday = next_week_range()
-    month = month_folder(monday)
     week_num = next_week_number()
 
-    week_folder = f"Semana{week_num:02d}-{monday.isoformat()}_{sunday.isoformat()}"
-    week_path = os.path.join(COLETAS_DIR, month, week_folder)
+    week_folder = f"semana{week_num:02d}-{monday.isoformat()}_{sunday.isoformat()}"
+    week_path = os.path.join(COLETAS_DIR, week_folder)
 
     for platform in PLATFORMS:
-        platform_folder = f"{platform}_{monday.isoformat()}_{sunday.isoformat()}"
-        platform_path = os.path.join(week_path, platform_folder)
+        platform_path = os.path.join(week_path, platform)
         os.makedirs(platform_path, exist_ok=True)
         gitkeep = os.path.join(platform_path, ".gitkeep")
         if not os.path.exists(gitkeep):
@@ -57,6 +75,9 @@ def create_structure():
     print(f"Created: {week_path}")
     print(f"  Period: {monday.isoformat()} to {sunday.isoformat()}")
     print(f"  Platforms: {', '.join(PLATFORMS)}")
+
+    cleanup_old_weeks(week_num)
+    print(f"  Kept last {KEEP_WEEKS} weeks.")
 
 
 if __name__ == "__main__":

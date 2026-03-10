@@ -30,17 +30,14 @@ COLLECTION_REGEX = re.compile(
 REGISTRO_REGEX = re.compile(
     rf"^registro_({PLATFORM_GROUP})_{DATE_PATTERN}_{DATE_PATTERN}\.csv$"
 )
-PLATFORM_FOLDER_REGEX = re.compile(
-    rf"^({PLATFORM_GROUP})_{DATE_PATTERN}_{DATE_PATTERN}$"
-)
+PLATFORM_FOLDER_NAMES = set(KNOWN_PLATFORMS)
 
 
 def extract_folder_platform(file_path: Path) -> str | None:
     """Extracts the platform name from the parent folder name."""
-    parent_name = file_path.parent.name
-    prefix = parent_name.split("_")[0].lower()
-    if prefix in KNOWN_PLATFORMS:
-        return prefix
+    parent_name = file_path.parent.name.lower()
+    if parent_name in PLATFORM_FOLDER_NAMES:
+        return parent_name
     return None
 
 
@@ -62,7 +59,7 @@ def extract_file_platform(file_path: Path) -> str | None:
 
 def is_inside_platform_folder(file_path: Path) -> bool:
     """Checks if the file is inside a recognized platform folder."""
-    return PLATFORM_FOLDER_REGEX.match(file_path.parent.name.lower()) is not None
+    return file_path.parent.name.lower() in PLATFORM_FOLDER_NAMES
 
 
 def classify_file(file_path: Path) -> str:
