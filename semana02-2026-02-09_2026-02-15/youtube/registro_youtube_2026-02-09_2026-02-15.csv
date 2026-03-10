@@ -1,0 +1,2 @@
+collect_posts_amount,collect_started_at,collect_done_at,collect_is_data_deduplicated,collect_is_ad_free,collect_is_privacy_validated,collect_errors,collect_warnings,collect_observations,collect_summary_observations
+2539,2026-02-16 11:51:00,2026-02-16 13:25:00,TRUE,TRUE,TRUE,None,None,,"O termo ""CAIXA"" tende a retornar muitos vídeos irrelevantes, tais como: sorteios de loteria."
