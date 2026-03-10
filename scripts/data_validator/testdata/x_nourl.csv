@@ -1,3 +1,0 @@
-post_original_id,post_description,post_validation_status,post_shares_count,post_comments_count,post_likes_count,post_author_username,post_author_id,post_hashtags,post_published_at,post_deleted_at,post_query,post_author_followers_count,post_author_followings_count,post_author_tweets_count,post_author_created_at,post_author_is_verified,post_author_user_description,post_location_name,post_type,post_lang
-111222333,An amazing tweet about data,VALID,50,10,100,user_one,AAAA,"{data,tech}",2026-02-02 00:00:00,,#data,5000,200,1500,2018-01-01T00:00:00+00:00,true,Just a bot,New York,tweet,en
-444555666,Another interesting update here,INVALID,0,0,5,user_two,AAAB,{news},2026-02-02 00:00:31,2023-10-27T10:00:00+00:00,#news,100,50,30,2022-05-20T10:30:00Z,false,,London,reply,en
