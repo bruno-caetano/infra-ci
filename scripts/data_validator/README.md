@@ -54,10 +54,6 @@ O workflow `validate_csv.yml` executa automaticamente em PRs que alteram arquivo
 
 1. **Pre-validate** — verifica nomes de arquivos e pastas
 2. **Validate CSV content** — valida conteúdo dos CSVs de coleta contra os schemas
-3. **Upload para Google Drive** — envia os arquivos via script Python (só roda se a validação passar)
-4. **Fechamento do PR** — PR é fechado automaticamente
-
-> Os CSVs nunca são mergeados no `main`. O PR serve apenas como gate de validação.
 
 ## Observações
 

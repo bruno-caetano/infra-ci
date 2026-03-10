@@ -1,7 +1,6 @@
 import json
 import os
 import re
-import shutil
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -31,33 +30,6 @@ def next_week_number():
     return highest + 1
 
 
-KEEP_WEEKS = 2
-
-
-def cleanup_old_weeks(current_week_num):
-    if not os.path.isdir(COLETAS_DIR):
-        return
-    cutoff = current_week_num - KEEP_WEEKS
-    for entry in sorted(os.listdir(COLETAS_DIR)):
-        match = re.match(r"semana(\d+)-", entry)
-        if not match:
-            continue
-        week_num = int(match.group(1))
-        if week_num > cutoff:
-            continue
-        week_path = os.path.join(COLETAS_DIR, entry)
-        has_files = any(
-            f != ".gitkeep"
-            for _, _, files in os.walk(week_path)
-            for f in files
-        )
-        if has_files:
-            print(f"[SKIP] {entry} (still has files)")
-            continue
-        shutil.rmtree(week_path)
-        print(f"[REMOVED] {entry}")
-
-
 def create_structure():
     monday, sunday = next_week_range()
     week_num = next_week_number()
@@ -75,9 +47,6 @@ def create_structure():
     print(f"Created: {week_path}")
     print(f"  Period: {monday.isoformat()} to {sunday.isoformat()}")
     print(f"  Platforms: {', '.join(PLATFORMS)}")
-
-    cleanup_old_weeks(week_num)
-    print(f"  Kept last {KEEP_WEEKS} weeks.")
 
 
 if __name__ == "__main__":
