@@ -7,7 +7,7 @@ Infraestrutura e CI/CD para gerenciamento de coletas de dados de redes sociais.
 ```
 .github/workflows/
 ├── create_next_week_folder.yml    # Agendado: cria estrutura de pastas semanal
-├── validate_csv.yml               # Trigger de PR: valida arquivos em coletas/
+├── collection_pr.yml                # Trigger de PR: valida coletas e bloqueia merge
 └── upload_to_cloudinary.yml        # Trigger de label: envia arquivos ao Cloudinary
 
 scripts/
@@ -75,7 +75,7 @@ Definidas em [`scripts/config.json`](scripts/config.json). Para adicionar ou rem
   1. **Pré-validação** — verifica se os arquivos seguem os padrões de nomenclatura e estão na pasta correta
   2. **Validação de conteúdo** — executa `validate_csv.py` com o parâmetro `--platform` correto para cada CSV de coleta
   3. **Comentário** — se tudo passar, comenta no PR instruindo a adicionar o label `upload`
-- **Arquivo:** [`.github/workflows/validate_csv.yml`](.github/workflows/validate_csv.yml)
+- **Arquivo:** [`.github/workflows/collection_pr.yml`](.github/workflows/collection_pr.yml)
 
 ### Upload para Cloudinary
 
@@ -120,27 +120,82 @@ Para mais opções (ignorar colunas, etc.), consulte:
 python3 scripts/data_validator/validate_csv.py --help
 ```
 
-## Setup do Cloudinary (para administradores)
+## Setup Inicial (para administradores)
 
-### 1. Criar conta
+Guia para configurar o projeto do zero em um novo repositório.
+
+### 1. Cloudinary
+
+O Cloudinary é utilizado para armazenar os arquivos de coleta (CSVs e TXTs).
 
 1. Acesse [cloudinary.com](https://cloudinary.com) e crie uma conta (plano free: 25GB)
-2. No **Dashboard**, copie: **Cloud Name**, **API Key** e **API Secret**
+2. No **Dashboard**, copie os 3 valores: **Cloud Name**, **API Key** e **API Secret**
 
-### 2. Configurar GitHub Secrets
+### 2. GitHub Secrets
 
-No repositório, vá em **Settings > Secrets and variables > Actions** e crie:
+No repositório, vá em **Settings > Secrets and variables > Actions** e crie os seguintes secrets:
 
-| Secret | Valor |
-|---|---|
-| `CLOUDINARY_CLOUD_NAME` | Cloud Name do dashboard |
-| `CLOUDINARY_API_KEY` | API Key |
-| `CLOUDINARY_API_SECRET` | API Secret |
+| Secret | Valor | Onde encontrar |
+|---|---|---|
+| `CLOUDINARY_CLOUD_NAME` | Cloud Name | Dashboard do Cloudinary |
+| `CLOUDINARY_API_KEY` | API Key | Dashboard do Cloudinary |
+| `CLOUDINARY_API_SECRET` | API Secret | Dashboard do Cloudinary |
 
-### 3. Criar label no repositório
+> Esses secrets são usados pelo workflow `upload_to_cloudinary.yml` para enviar os arquivos.
 
-1. Vá em **Issues > Labels > New label**
-2. Nome: `upload`
-3. Cor: escolha uma cor (sugestão: verde)
+### 3. Label de upload
 
-Após esses passos, o fluxo de upload estará funcional.
+Crie o label que dispara o envio ao Cloudinary:
+
+1. No repositório, vá em **Issues > Labels > New label**
+2. Nome: **`upload`**
+3. Cor: escolha uma cor (sugestão: `#0E8A16` verde)
+4. Descrição (opcional): `Dispara upload dos arquivos para o Cloudinary`
+
+### 4. Branch Protection Rules
+
+Configure regras de proteção para impedir que PRs de coleta sejam mergeados acidentalmente:
+
+1. Vá em **Settings > Branches > Add branch protection rule**
+2. Branch name pattern: **`main`**
+3. Marque **"Require status checks to pass before merging"**
+4. Em **"Status checks that are required"**, busque e adicione: **`block-merge`**
+5. (Opcional) Marque **"Require a pull request before merging"** para exigir PRs
+6. (Opcional) Marque **"Do not allow bypassing the above settings"** para aplicar a regra inclusive para admins
+7. Clique em **Create** / **Save changes**
+
+> O check `block-merge` é um job do workflow `collection_pr.yml` que **sempre falha** em PRs que alteram `coletas/`. Isso desabilita o botão de merge nesses PRs. PRs que não tocam em `coletas/` não são afetados.
+
+### 5. Verificar workflows
+
+Confirme que os 3 workflows estão presentes em `.github/workflows/`:
+
+| Workflow | Trigger | Função |
+|---|---|---|
+| `create_next_week_folder.yml` | Cron (domingo 18h UTC) + manual | Cria pastas da próxima semana |
+| `collection_pr.yml` | PR em `coletas/**` | Valida arquivos e bloqueia merge |
+| `upload_to_cloudinary.yml` | Label `upload` no PR | Envia arquivos ao Cloudinary e fecha PR |
+
+### Resumo do fluxo
+
+```
+Contribuidor abre PR com CSVs em coletas/
+        │
+        ▼
+  collection_pr.yml roda:
+  ├── Validação (pre_validate + validate_csv)
+  ├── Comentário: "Adicione label upload"
+  └── block-merge: impede merge (sempre falha)
+        │
+        ▼
+  Revisor adiciona label "upload"
+        │
+        ▼
+  upload_to_cloudinary.yml roda:
+  ├── Verifica se validação passou
+  ├── Faz upload para Cloudinary
+  ├── Atualiza coletas_index.md
+  └── Fecha PR automaticamente
+```
+
+Após esses passos, o projeto está pronto para receber coletas.
