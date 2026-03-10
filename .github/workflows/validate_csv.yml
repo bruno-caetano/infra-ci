@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ master, main ]
     paths:
-      - 'coletas/**.csv'
+      - 'coletas/**'
 
 jobs:
   validate_csv:
@@ -20,11 +20,14 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Get changed CSV files
+      - name: Get changed files
         run: |
-          git diff --name-only origin/${{ github.base_ref }} -- 'coletas/**.csv' > changed_csvs.txt
-          echo "Changed CSV files:"
-          cat changed_csvs.txt
+          git diff --name-only origin/${{ github.base_ref }} -- 'coletas/' > changed_files.txt
+          echo "Changed files:"
+          cat changed_files.txt
 
-      - name: Run validation
-        run: python scripts/data_validator/run_validation.py changed_csvs.txt
+      - name: Pre-validate file structure
+        run: python scripts/data_validator/pre_validate.py changed_files.txt
+
+      - name: Validate CSV content
+        run: python scripts/data_validator/run_validation.py changed_files.txt
