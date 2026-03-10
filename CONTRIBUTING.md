@@ -91,10 +91,6 @@ git push origin coleta/instagram-semana05
 - O CI vai rodar automaticamente:
   1. **Pré-validação** — verifica se os nomes dos arquivos estão corretos
   2. **Validação de conteúdo** — verifica colunas, tipos e formatos do CSV
-  3. **Upload para Google Drive** — se tudo passar, os arquivos são enviados automaticamente
-  4. **Fechamento do PR** — o PR é fechado automaticamente com comentário de sucesso
-
-> **Nota:** O PR **não é mergeado**. Ele serve apenas como gate de validação. Os CSVs vão direto para o Google Drive.
 
 ### 5. Corrigir erros (se houver)
 
@@ -104,7 +100,11 @@ Se o CI falhar, verifique os logs na aba Actions do GitHub:
 - **`[FAIL] Platform mismatch`** — arquivo na pasta da plataforma errada
 - **Erros de schema** — colunas faltando ou tipos incorretos no CSV
 
-Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cada push. O upload só acontece quando todas as validações passarem.
+Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cada push.
+
+### 6. Merge
+
+Após o CI passar e a revisão ser aprovada, faça o merge do PR.
 
 ## PRs Parciais
 
