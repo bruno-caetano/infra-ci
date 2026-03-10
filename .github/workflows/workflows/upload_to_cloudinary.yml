@@ -1,0 +1,83 @@
+name: Upload to Cloudinary
+
+on:
+  pull_request:
+    types: [labeled]
+    branches: [master, main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  upload:
+    if: github.event.label.name == 'upload'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install cloudinary
+
+      - name: Upload to Cloudinary
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        run: python scripts/cloudinary/upload.py
+
+      - name: Update coletas index
+        run: |
+          git fetch origin main
+          git checkout origin/main -- coletas_index.md 2>/dev/null || true
+          python scripts/cloudinary/update_index.py
+
+      - name: Commit index to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git stash push -- coletas_index.md
+          git checkout main
+          git stash pop
+          git add coletas_index.md
+          git diff --cached --quiet || git commit -m "docs: atualizar índice de coletas [skip ci]"
+          git push origin main
+
+      - name: Comment and close PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = 'Upload para o Cloudinary concluído com sucesso.\n\n';
+            try {
+              const uploaded = JSON.parse(fs.readFileSync('uploaded_files.json', 'utf8'));
+              body += '### Arquivos enviados\n\n';
+              for (const f of uploaded) {
+                body += `- [${f.file}](${f.url})\n`;
+              }
+              body += '\nÍndice atualizado em [`coletas_index.md`](../blob/main/coletas_index.md).\n';
+            } catch (e) {
+              body += 'Verifique o índice em `coletas_index.md`.\n';
+            }
+            body += '\nFechando PR automaticamente.';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              state: 'closed'
+            });
