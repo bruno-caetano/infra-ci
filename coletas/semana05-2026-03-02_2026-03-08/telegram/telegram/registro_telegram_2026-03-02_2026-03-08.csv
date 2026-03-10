@@ -1,3 +1,0 @@
-collect_posts_amount,collect_started_at,collect_done_at,collect_is_data_deduplicated,collect_is_ad_free,collect_is_privacy_validated,collect_warnings,collect_errors,collect_observations,collect_summary_observations
-860,2026-03-09 00:07:21,2026-03-09 01:02:21,FALSE,FALSE,TRUE,Sem alertas emitidos,"erro +UZwT7YfLq5ITz0e9
-❌ Error joining +15ikI0fKAw45MTlh: A wait of 380 seconds is required (caused by ImportChatInviteRequest)","Os links não coletados envolvem grupos privados, o script precisa ser reavaliado para conseguir coletar desse tipo de entidade.","Grupos privados ainda não coletados; Os dados não foram validados realmente em questão de contexto, somente marcados como ""VALID"""
