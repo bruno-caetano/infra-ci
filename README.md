@@ -152,28 +152,14 @@ Crie o label que dispara o envio ao Cloudinary:
 3. Cor: escolha uma cor (sugestão: `#0E8A16` verde)
 4. Descrição (opcional): `Dispara upload dos arquivos para o Cloudinary`
 
-### 4. Branch Protection Rules
-
-Configure regras de proteção para impedir que PRs de coleta sejam mergeados acidentalmente:
-
-1. Vá em **Settings > Branches > Add branch protection rule**
-2. Branch name pattern: **`main`**
-3. Marque **"Require status checks to pass before merging"**
-4. Em **"Status checks that are required"**, busque e adicione: **`block-merge`**
-5. (Opcional) Marque **"Require a pull request before merging"** para exigir PRs
-6. (Opcional) Marque **"Do not allow bypassing the above settings"** para aplicar a regra inclusive para admins
-7. Clique em **Create** / **Save changes**
-
-> O check `block-merge` é um job do workflow `collection_pr.yml` que **sempre falha** em PRs que alteram `coletas/`. Isso desabilita o botão de merge nesses PRs. PRs que não tocam em `coletas/` não são afetados.
-
-### 5. Verificar workflows
+### 4. Verificar workflows
 
 Confirme que os 3 workflows estão presentes em `.github/workflows/`:
 
 | Workflow | Trigger | Função |
 |---|---|---|
 | `create_next_week_folder.yml` | Cron (domingo 18h UTC) + manual | Cria pastas da próxima semana |
-| `collection_pr.yml` | PR em `coletas/**` | Valida arquivos e bloqueia merge |
+| `collection_pr.yml` | PR em `coletas/**` | Valida arquivos e avisa para não mergear |
 | `upload_to_cloudinary.yml` | Label `upload` no PR | Envia arquivos ao Cloudinary e fecha PR |
 
 ### Resumo do fluxo
@@ -184,8 +170,7 @@ Contribuidor abre PR com CSVs em coletas/
         ▼
   collection_pr.yml roda:
   ├── Validação (pre_validate + validate_csv)
-  ├── Comentário: "Adicione label upload"
-  └── block-merge: impede merge (sempre falha)
+  └── Comentário: "Não faça merge. Adicione label upload"
         │
         ▼
   Revisor adiciona label "upload"
