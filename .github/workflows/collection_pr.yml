@@ -43,15 +43,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'Validacao concluida com sucesso.\n\nPara enviar os arquivos ao Cloudinary, adicione o label **`upload`** a este PR.'
+              body: '✅ Validação concluída com sucesso.\n\n⚠️ **Não faça merge deste PR.** Os arquivos de coleta são enviados diretamente ao Cloudinary.\n\nPara fazer o upload, adicione o label **`upload`** a este PR. Após o envio, o PR será fechado automaticamente.'
             });
-
-  block-merge:
-    needs: validate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Block merge
-        run: |
-          echo "Este PR não deve ser mergeado. Os arquivos de coleta são enviados ao Cloudinary via label 'upload'."
-          echo "Após o upload, o PR será fechado automaticamente."
-          exit 1
