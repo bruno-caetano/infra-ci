@@ -40,14 +40,14 @@ jobs:
           git fetch origin main
           git checkout origin/main -- coletas_index.md 2>/dev/null || true
           python scripts/cloudinary/update_index.py
+          cp coletas_index.md /tmp/coletas_index.md
 
       - name: Commit index to main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git stash push -- coletas_index.md
           git checkout main
-          git stash pop
+          cp /tmp/coletas_index.md coletas_index.md
           git add coletas_index.md
           git diff --cached --quiet || git commit -m "docs: atualizar índice de coletas [skip ci]"
           git push origin main
