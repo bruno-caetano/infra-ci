@@ -11,14 +11,16 @@ Guia passo a passo para subir arquivos de coleta via Pull Request.
 
 ```
 coletas/
-└── 03-2026/
-    └── Semana05-2026-03-02_2026-03-08/
-        ├── facebook_2026-03-02_2026-03-08/
-        ├── instagram_2026-03-02_2026-03-08/
-        ├── telegram_2026-03-02_2026-03-08/
-        ├── tiktok_2026-03-02_2026-03-08/
-        ├── x_2026-03-02_2026-03-08/
-        └── youtube_2026-03-02_2026-03-08/
+├── semana05-2026-03-02_2026-03-08/
+│   ├── facebook/
+│   ├── instagram/
+│   ├── telegram/
+│   ├── tiktok/
+│   ├── x/
+│   └── youtube/
+├── semana06-2026-03-09_2026-03-15/
+│   └── ...
+└── ...
 ```
 
 O número da semana (`05`) é sequencial e contínuo entre meses.
@@ -36,7 +38,7 @@ Dentro de cada pasta de plataforma, **somente** os seguintes arquivos são aceit
 ### Exemplos válidos
 
 ```
-instagram_2026-03-02_2026-03-08/
+instagram/
 ├── instagram_2026-03-02_2026-03-08.csv            (ok - coleta)
 ├── registro_instagram_2026-03-02_2026-03-08.csv   (ok - registro)
 └── observacoes.txt                                (ok - notas)
@@ -45,7 +47,7 @@ instagram_2026-03-02_2026-03-08/
 ### Exemplos inválidos
 
 ```
-instagram_2026-03-02_2026-03-08/
+instagram/
 ├── Instagram_2026-03-02.csv           ERRO: falta segunda data
 ├── insta_2026-03-02_2026-03-08.csv    ERRO: nome da plataforma incorreto
 ├── dados.xlsx                         ERRO: formato não permitido
@@ -70,10 +72,10 @@ Exemplo: `coleta/instagram-semana05`
 Coloque o CSV de coleta na pasta correta:
 
 ```bash
-cp seu_arquivo.csv coletas/03-2026/Semana05-2026-03-02_2026-03-08/instagram_2026-03-02_2026-03-08/instagram_2026-03-02_2026-03-08.csv
+cp seu_arquivo.csv coletas/semana05-2026-03-02_2026-03-08/instagram/instagram_2026-03-02_2026-03-08.csv
 ```
 
-> **Importante:** o nome do arquivo deve ser **exatamente** `{plataforma}_{YYYY-MM-DD}_{YYYY-MM-DD}.csv`, usando as mesmas datas da pasta.
+> **Importante:** o nome do arquivo deve ser **exatamente** `{plataforma}_{YYYY-MM-DD}_{YYYY-MM-DD}.csv`.
 
 ### 3. Commit e push
 
@@ -89,6 +91,10 @@ git push origin coleta/instagram-semana05
 - O CI vai rodar automaticamente:
   1. **Pré-validação** — verifica se os nomes dos arquivos estão corretos
   2. **Validação de conteúdo** — verifica colunas, tipos e formatos do CSV
+  3. **Upload para Google Drive** — se tudo passar, os arquivos são enviados automaticamente
+  4. **Fechamento do PR** — o PR é fechado automaticamente com comentário de sucesso
+
+> **Nota:** O PR **não é mergeado**. Ele serve apenas como gate de validação. Os CSVs vão direto para o Google Drive.
 
 ### 5. Corrigir erros (se houver)
 
@@ -98,11 +104,7 @@ Se o CI falhar, verifique os logs na aba Actions do GitHub:
 - **`[FAIL] Platform mismatch`** — arquivo na pasta da plataforma errada
 - **Erros de schema** — colunas faltando ou tipos incorretos no CSV
 
-Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cada push.
-
-### 6. Merge
-
-Após o CI passar e a revisão ser aprovada, faça o merge do PR.
+Corrija os erros, faça commit e push novamente. O CI roda automaticamente a cada push. O upload só acontece quando todas as validações passarem.
 
 ## PRs Parciais
 
