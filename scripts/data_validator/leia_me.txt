@@ -1,0 +1,22 @@
+Instruções para uso do script de validação de arquivos de coleta
+==============================================================================
+
+O script está no diretório "scripts". O formato de uso é:
+    python validatecsv.py arquivo.csv -p plataforma
+
+Por exemplo:
+    python validatecsv.py data/youtube_upload.csv --p youtube
+
+Você pode consultar a ajuda com:
+    python validatecsv.py --help
+
+Os valores válidos do parâmetro "plataforma" são: x, instagram, youtube, facebook, tiktok, telegram.
+
+O parâmetro "-i" ou "--ignore" permite ignorar uma coluna específica durante a verificação das linhas. Isso é útil para diminuir o número de avisos e permitir a análise coluna a coluna. Para ignorar múltiplas colunas, é preciso adicionar o parâmetro mais de uma vez, como em "-i coluna1 -i coluna2 -i coluna3".
+
+O script depende de outros módulos que estão em "src/lib". O arquivo "_mypath.py" deveria se encarregar de ajustar os paths para que o script encontre suas dependências. Se você receber alguma mensagem de módulo faltante, pergunte no grupo dos alunos e transcreva a mensagem de erro.
+
+Todo software contém bugs e este script não é diferente. Caso você ache que o script aponta um erro indevidamente, use o checklist como referência e exerça seu julgamento. O script tenta diferenciar entre erros (mais importantes) e avisos. É provável que o script ainda aponte avisos, mesmo quando seu arquivo csv estiver correto.
+
+Em caso de dúvidas, mande uma mensagem no grupo dos alunos de IC ou escreva para carlos.ssantos@ufabc.edu.br.
+
