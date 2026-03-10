@@ -1,0 +1,30 @@
+name: Validate CSV Data
+
+on:
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'coletas/**.csv'
+
+jobs:
+  validate_csv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Get changed CSV files
+        run: |
+          git diff --name-only origin/${{ github.base_ref }} -- 'coletas/**.csv' > changed_csvs.txt
+          echo "Changed CSV files:"
+          cat changed_csvs.txt
+
+      - name: Run validation
+        run: python scripts/data_validator/run_validation.py changed_csvs.txt
