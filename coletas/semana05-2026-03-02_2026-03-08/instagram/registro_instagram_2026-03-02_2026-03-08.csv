@@ -1,0 +1,2 @@
+collect_posts_amount,collect_started_at,collect_done_at,collect_is_data_deduplicated,collect_is_ad_free,collect_is_privacy_validated,collect_warnings,collect_errors,collect_observations,collect_summary_observations
+5752,08/02/2026 21:00,09/03/2026 11:00,TRUE,FALSE,TRUE,null,"coleta de 6 posts fora das querys, ao abrir o instagram pela pagina inicial. Correçao no tratamento",null,perfil sem correspondencia: sistmeafaetsenar
